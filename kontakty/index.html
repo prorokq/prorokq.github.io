@@ -4,17 +4,14 @@
           // Считаем только посещения боевого домена, чтобы QA не искажал рекламу и цели.
           var isLiveDomain = location.hostname === "dezmarshall.ru" || location.hostname === "www.dezmarshall.ru";
           if (isLiveDomain) {
-          (function (m, e, t, r, i, k, a) {
-            m[i] = m[i] || function () { (m[i].a = m[i].a || []).push(arguments); };
-            m[i].l = 1 * new Date();
-            for (var j = 0; j < document.scripts.length; j++) { if (document.scripts[j].src === r) { return; } }
-            k = e.createElement(t), a = e.getElementsByTagName(t)[0], k.async = 1, k.src = r, a.parentNode.insertBefore(k, a);
-          })(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+          var pendingYmGoals = [];
+          var metrikaStarted = false;
 
-          ym(ymId, "init", { clickmap: true, trackLinks: true, accurateTrackBounce: true, webvisor: true });
-
-          // Хелпер целей: один источник номера счётчика на весь сайт.
-          window.ymGoal = function (g) { if (window.ym) window.ym(ymId, "reachGoal", g); };
+          // Очередь не теряет быстрые клики, пока внешний счётчик ещё не запущен.
+          window.ymGoal = function (g) {
+            if (window.ym && metrikaStarted) window.ym(ymId, "reachGoal", g);
+            else pendingYmGoals.push(g);
+          };
 
           // Клики по телефону и Telegram — считаем как микроконверсии.
           document.addEventListener("click", function (ev) {
@@ -25,6 +22,22 @@
             if (href.indexOf("tel:") === 0) window.ymGoal("phone_click");
             else if (href.indexOf("t.me/") > -1) window.ymGoal("telegram_click");
           });
+
+          var startMetrika = function () {
+            if (metrikaStarted) return;
+            metrikaStarted = true;
+            (function (m, e, t, r, i, k, a) {
+              m[i] = m[i] || function () { (m[i].a = m[i].a || []).push(arguments); };
+              m[i].l = 1 * new Date();
+              for (var j = 0; j < document.scripts.length; j++) { if (document.scripts[j].src === r) return; }
+              k = e.createElement(t), a = e.getElementsByTagName(t)[0], k.async = 1, k.src = r, a.parentNode.insertBefore(k, a);
+            })(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+            ym(ymId, "init", { clickmap: true, trackLinks: true, accurateTrackBounce: true, webvisor: true });
+            pendingYmGoals.splice(0).forEach(function (goal) { window.ym(ymId, "reachGoal", goal); });
+          };
+
+          if ("requestIdleCallback" in window) window.requestIdleCallback(startMetrika, { timeout: 2500 });
+          else window.setTimeout(startMetrika, 1500);
           }
         })();</script><link rel="stylesheet" href="/_astro/Layout.Ds-rd8lp.css"><style>.page-header[data-astro-cid-b2i3gsw2]{background:var(--hero-bg);padding:22px 0 26px}.page-header[data-astro-cid-b2i3gsw2] h1[data-astro-cid-b2i3gsw2]{margin-bottom:0}.page-header[data-astro-cid-b2i3gsw2] .breadcrumbs{margin-bottom:12px}
 .contacts-page[data-astro-cid-ltd53nb3]{gap:28px;display:grid}.contacts-intro[data-astro-cid-ltd53nb3]{max-width:68ch}.contacts-intro[data-astro-cid-ltd53nb3] h2[data-astro-cid-ltd53nb3]{margin-bottom:8px}.contacts-intro[data-astro-cid-ltd53nb3] p[data-astro-cid-ltd53nb3]{margin:0}.contact-methods[data-astro-cid-ltd53nb3],.contact-details[data-astro-cid-ltd53nb3]{gap:16px;display:grid}.contact-card[data-astro-cid-ltd53nb3]{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-card);min-width:0;padding:20px}.contact-card--method[data-astro-cid-ltd53nb3]{grid-template-columns:auto minmax(0,1fr);align-items:start;gap:16px;display:grid}.contact-card__body[data-astro-cid-ltd53nb3]{min-width:0}.contact-card__eyebrow[data-astro-cid-ltd53nb3]{color:var(--accent-dark);letter-spacing:.035em;text-transform:uppercase;margin:0 0 4px;font-size:.78rem;font-weight:700}.contact-card[data-astro-cid-ltd53nb3] h2[data-astro-cid-ltd53nb3]{margin:0 0 8px;font-size:1.1rem}.contact-card[data-astro-cid-ltd53nb3] p[data-astro-cid-ltd53nb3]:last-child{margin-bottom:0}.contact-icon[data-astro-cid-ltd53nb3]{width:52px;height:52px;color:var(--accent-dark);background:var(--accent-tint);border-radius:15px;flex:none;place-items:center;display:grid}.contact-icon[data-astro-cid-ltd53nb3] svg[data-astro-cid-ltd53nb3]{fill:none;stroke:currentColor;stroke-width:1.8px;stroke-linecap:round;stroke-linejoin:round;width:27px;height:27px}.contact-icon--small[data-astro-cid-ltd53nb3]{border-radius:13px;width:44px;height:44px}.contact-icon--small[data-astro-cid-ltd53nb3] svg[data-astro-cid-ltd53nb3]{width:23px;height:23px}.contact-value[data-astro-cid-ltd53nb3],.contact-email[data-astro-cid-ltd53nb3]{max-width:100%;min-height:38px;color:var(--ink);overflow-wrap:anywhere;align-items:center;margin-bottom:8px;font-size:clamp(1.08rem,3.8vw,1.35rem);font-weight:700;display:inline-flex}.contact-action[data-astro-cid-ltd53nb3]{border:1px solid var(--accent);border-radius:var(--radius-button);min-height:48px;color:var(--accent-dark);grid-column:1/-1;justify-content:center;align-items:center;padding:10px 18px;font-weight:700;text-decoration:none;display:inline-flex}.contact-action[data-astro-cid-ltd53nb3]:hover{background:var(--accent-tint)}.contact-action--primary[data-astro-cid-ltd53nb3]{color:#fff;background:var(--accent-dark);border-color:var(--accent-dark)}.contact-action--primary[data-astro-cid-ltd53nb3]:hover{color:#fff;background:var(--accent)}.contact-card--detail[data-astro-cid-ltd53nb3]{grid-template-columns:auto minmax(0,1fr);align-items:start;gap:14px;display:grid}.contact-card--detail[data-astro-cid-ltd53nb3] p[data-astro-cid-ltd53nb3]{font-size:.92rem}.contact-detail-value[data-astro-cid-ltd53nb3]{color:var(--ink);line-height:1.45}@media (width>=700px){.contact-methods[data-astro-cid-ltd53nb3],.contact-details[data-astro-cid-ltd53nb3]{grid-template-columns:repeat(2,minmax(0,1fr))}.contact-card--method[data-astro-cid-ltd53nb3]{grid-template-rows:1fr auto;padding:24px}.contact-card--detail[data-astro-cid-ltd53nb3]{grid-template-columns:1fr;align-content:start}}@media (width>=1050px){.contact-details[data-astro-cid-ltd53nb3]{grid-template-columns:repeat(4,minmax(0,1fr))}}

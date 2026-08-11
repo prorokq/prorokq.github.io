@@ -4,17 +4,14 @@
           // Считаем только посещения боевого домена, чтобы QA не искажал рекламу и цели.
           var isLiveDomain = location.hostname === "dezmarshall.ru" || location.hostname === "www.dezmarshall.ru";
           if (isLiveDomain) {
-          (function (m, e, t, r, i, k, a) {
-            m[i] = m[i] || function () { (m[i].a = m[i].a || []).push(arguments); };
-            m[i].l = 1 * new Date();
-            for (var j = 0; j < document.scripts.length; j++) { if (document.scripts[j].src === r) { return; } }
-            k = e.createElement(t), a = e.getElementsByTagName(t)[0], k.async = 1, k.src = r, a.parentNode.insertBefore(k, a);
-          })(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+          var pendingYmGoals = [];
+          var metrikaStarted = false;
 
-          ym(ymId, "init", { clickmap: true, trackLinks: true, accurateTrackBounce: true, webvisor: true });
-
-          // Хелпер целей: один источник номера счётчика на весь сайт.
-          window.ymGoal = function (g) { if (window.ym) window.ym(ymId, "reachGoal", g); };
+          // Очередь не теряет быстрые клики, пока внешний счётчик ещё не запущен.
+          window.ymGoal = function (g) {
+            if (window.ym && metrikaStarted) window.ym(ymId, "reachGoal", g);
+            else pendingYmGoals.push(g);
+          };
 
           // Клики по телефону и Telegram — считаем как микроконверсии.
           document.addEventListener("click", function (ev) {
@@ -25,6 +22,22 @@
             if (href.indexOf("tel:") === 0) window.ymGoal("phone_click");
             else if (href.indexOf("t.me/") > -1) window.ymGoal("telegram_click");
           });
+
+          var startMetrika = function () {
+            if (metrikaStarted) return;
+            metrikaStarted = true;
+            (function (m, e, t, r, i, k, a) {
+              m[i] = m[i] || function () { (m[i].a = m[i].a || []).push(arguments); };
+              m[i].l = 1 * new Date();
+              for (var j = 0; j < document.scripts.length; j++) { if (document.scripts[j].src === r) return; }
+              k = e.createElement(t), a = e.getElementsByTagName(t)[0], k.async = 1, k.src = r, a.parentNode.insertBefore(k, a);
+            })(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+            ym(ymId, "init", { clickmap: true, trackLinks: true, accurateTrackBounce: true, webvisor: true });
+            pendingYmGoals.splice(0).forEach(function (goal) { window.ym(ymId, "reachGoal", goal); });
+          };
+
+          if ("requestIdleCallback" in window) window.requestIdleCallback(startMetrika, { timeout: 2500 });
+          else window.setTimeout(startMetrika, 1500);
           }
         })();</script><link rel="stylesheet" href="/_astro/Layout.Ds-rd8lp.css"><style>.page-header[data-astro-cid-b2i3gsw2]{background:var(--hero-bg);padding:22px 0 26px}.page-header[data-astro-cid-b2i3gsw2] h1[data-astro-cid-b2i3gsw2]{margin-bottom:0}.page-header[data-astro-cid-b2i3gsw2] .breadcrumbs{margin-bottom:12px}
 .levels[data-astro-cid-uxnxqoji]{gap:16px;margin:8px 0;display:grid}.level-card[data-astro-cid-uxnxqoji]{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-card);box-shadow:var(--shadow-sm);gap:16px;padding:22px;display:flex}.level-card__num[data-astro-cid-uxnxqoji]{background:var(--accent);width:40px;height:40px;color:var(--on-accent);border-radius:50%;flex:none;place-items:center;font-size:1.1rem;font-weight:700;display:grid}.level-card__body[data-astro-cid-uxnxqoji]{flex:1}.level-card__body[data-astro-cid-uxnxqoji] h2[data-astro-cid-uxnxqoji]{margin:0 0 .2em;font-size:1.2rem}.level-card__tag[data-astro-cid-uxnxqoji]{color:var(--accent-dark);margin:0 0 .6em;font-weight:600}.level-card__body[data-astro-cid-uxnxqoji] ul[data-astro-cid-uxnxqoji]{margin:0;padding-left:20px}.level-card__body[data-astro-cid-uxnxqoji] li[data-astro-cid-uxnxqoji]{color:var(--muted);margin-bottom:6px;font-size:.92rem}

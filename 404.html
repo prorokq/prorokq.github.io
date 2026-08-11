@@ -4,17 +4,14 @@
           // Считаем только посещения боевого домена, чтобы QA не искажал рекламу и цели.
           var isLiveDomain = location.hostname === "dezmarshall.ru" || location.hostname === "www.dezmarshall.ru";
           if (isLiveDomain) {
-          (function (m, e, t, r, i, k, a) {
-            m[i] = m[i] || function () { (m[i].a = m[i].a || []).push(arguments); };
-            m[i].l = 1 * new Date();
-            for (var j = 0; j < document.scripts.length; j++) { if (document.scripts[j].src === r) { return; } }
-            k = e.createElement(t), a = e.getElementsByTagName(t)[0], k.async = 1, k.src = r, a.parentNode.insertBefore(k, a);
-          })(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+          var pendingYmGoals = [];
+          var metrikaStarted = false;
 
-          ym(ymId, "init", { clickmap: true, trackLinks: true, accurateTrackBounce: true, webvisor: true });
-
-          // Хелпер целей: один источник номера счётчика на весь сайт.
-          window.ymGoal = function (g) { if (window.ym) window.ym(ymId, "reachGoal", g); };
+          // Очередь не теряет быстрые клики, пока внешний счётчик ещё не запущен.
+          window.ymGoal = function (g) {
+            if (window.ym && metrikaStarted) window.ym(ymId, "reachGoal", g);
+            else pendingYmGoals.push(g);
+          };
 
           // Клики по телефону и Telegram — считаем как микроконверсии.
           document.addEventListener("click", function (ev) {
@@ -25,6 +22,22 @@
             if (href.indexOf("tel:") === 0) window.ymGoal("phone_click");
             else if (href.indexOf("t.me/") > -1) window.ymGoal("telegram_click");
           });
+
+          var startMetrika = function () {
+            if (metrikaStarted) return;
+            metrikaStarted = true;
+            (function (m, e, t, r, i, k, a) {
+              m[i] = m[i] || function () { (m[i].a = m[i].a || []).push(arguments); };
+              m[i].l = 1 * new Date();
+              for (var j = 0; j < document.scripts.length; j++) { if (document.scripts[j].src === r) return; }
+              k = e.createElement(t), a = e.getElementsByTagName(t)[0], k.async = 1, k.src = r, a.parentNode.insertBefore(k, a);
+            })(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+            ym(ymId, "init", { clickmap: true, trackLinks: true, accurateTrackBounce: true, webvisor: true });
+            pendingYmGoals.splice(0).forEach(function (goal) { window.ym(ymId, "reachGoal", goal); });
+          };
+
+          if ("requestIdleCallback" in window) window.requestIdleCallback(startMetrika, { timeout: 2500 });
+          else window.setTimeout(startMetrika, 1500);
           }
         })();</script><link rel="stylesheet" href="/_astro/Layout.Ds-rd8lp.css"></head> <body> <a class="skip-link" href="#main-content">Перейти к содержимому</a> <header class="site-header"> <input type="checkbox" id="nav-toggle" class="nav-toggle-checkbox" aria-label="Открыть меню"> <div class="container site-header__inner"> <a href="/" class="wordmark"> <svg viewBox="0 0 100 100" class="mark" aria-hidden="true"> <g fill="none" stroke="#0b5642" stroke-width="10" stroke-linecap="round"> <path d="M18 38 V26 Q18 18 26 18 H38"></path> <path d="M62 18 H74 Q82 18 82 26 V38"></path> <path d="M82 62 V74 Q82 82 74 82 H62"></path> <path d="M38 82 H26 Q18 82 18 74 V62"></path> </g> <rect x="42" y="42" width="16" height="16" rx="5" fill="#0f6b52"></rect> </svg> <span>Dez<em>·</em>Marshall</span> </a> <nav class="site-nav" aria-label="Основная навигация"> <div class="site-nav__dropdown"> <a href="/uslugi/" class="site-nav__trigger" aria-haspopup="true">
 Услуги

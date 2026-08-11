@@ -4,17 +4,14 @@
           // Считаем только посещения боевого домена, чтобы QA не искажал рекламу и цели.
           var isLiveDomain = location.hostname === "dezmarshall.ru" || location.hostname === "www.dezmarshall.ru";
           if (isLiveDomain) {
-          (function (m, e, t, r, i, k, a) {
-            m[i] = m[i] || function () { (m[i].a = m[i].a || []).push(arguments); };
-            m[i].l = 1 * new Date();
-            for (var j = 0; j < document.scripts.length; j++) { if (document.scripts[j].src === r) { return; } }
-            k = e.createElement(t), a = e.getElementsByTagName(t)[0], k.async = 1, k.src = r, a.parentNode.insertBefore(k, a);
-          })(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+          var pendingYmGoals = [];
+          var metrikaStarted = false;
 
-          ym(ymId, "init", { clickmap: true, trackLinks: true, accurateTrackBounce: true, webvisor: true });
-
-          // Хелпер целей: один источник номера счётчика на весь сайт.
-          window.ymGoal = function (g) { if (window.ym) window.ym(ymId, "reachGoal", g); };
+          // Очередь не теряет быстрые клики, пока внешний счётчик ещё не запущен.
+          window.ymGoal = function (g) {
+            if (window.ym && metrikaStarted) window.ym(ymId, "reachGoal", g);
+            else pendingYmGoals.push(g);
+          };
 
           // Клики по телефону и Telegram — считаем как микроконверсии.
           document.addEventListener("click", function (ev) {
@@ -25,6 +22,22 @@
             if (href.indexOf("tel:") === 0) window.ymGoal("phone_click");
             else if (href.indexOf("t.me/") > -1) window.ymGoal("telegram_click");
           });
+
+          var startMetrika = function () {
+            if (metrikaStarted) return;
+            metrikaStarted = true;
+            (function (m, e, t, r, i, k, a) {
+              m[i] = m[i] || function () { (m[i].a = m[i].a || []).push(arguments); };
+              m[i].l = 1 * new Date();
+              for (var j = 0; j < document.scripts.length; j++) { if (document.scripts[j].src === r) return; }
+              k = e.createElement(t), a = e.getElementsByTagName(t)[0], k.async = 1, k.src = r, a.parentNode.insertBefore(k, a);
+            })(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+            ym(ymId, "init", { clickmap: true, trackLinks: true, accurateTrackBounce: true, webvisor: true });
+            pendingYmGoals.splice(0).forEach(function (goal) { window.ym(ymId, "reachGoal", goal); });
+          };
+
+          if ("requestIdleCallback" in window) window.requestIdleCallback(startMetrika, { timeout: 2500 });
+          else window.setTimeout(startMetrika, 1500);
           }
         })();</script><link rel="stylesheet" href="/_astro/Layout.Ds-rd8lp.css"><style>.page-header[data-astro-cid-b2i3gsw2]{background:var(--hero-bg);padding:22px 0 26px}.page-header[data-astro-cid-b2i3gsw2] h1[data-astro-cid-b2i3gsw2]{margin-bottom:0}.page-header[data-astro-cid-b2i3gsw2] .breadcrumbs{margin-bottom:12px}
 .faq[data-astro-cid-hmbqz6xi]{background:var(--hero-bg);border:1px solid var(--line);border-radius:var(--radius-card);margin-top:2.5em;padding:20px}.faq[data-astro-cid-hmbqz6xi] h2[data-astro-cid-hmbqz6xi]{margin-bottom:12px}.faq[data-astro-cid-hmbqz6xi] details[data-astro-cid-hmbqz6xi]{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-button);margin-top:10px;padding:0 16px}.faq[data-astro-cid-hmbqz6xi] summary[data-astro-cid-hmbqz6xi]{cursor:pointer;align-items:center;min-height:52px;padding:10px 36px 10px 0;font-weight:600;display:flex;position:relative}.faq[data-astro-cid-hmbqz6xi] summary[data-astro-cid-hmbqz6xi]::-webkit-details-marker{display:none}.faq[data-astro-cid-hmbqz6xi] summary[data-astro-cid-hmbqz6xi]::marker{content:""}.faq[data-astro-cid-hmbqz6xi] summary[data-astro-cid-hmbqz6xi]:after{content:"";border-right:2px solid var(--accent);border-bottom:2px solid var(--accent);width:9px;height:9px;transition:transform .15s;position:absolute;top:50%;right:4px;transform:translateY(-70%)rotate(45deg)}.faq[data-astro-cid-hmbqz6xi] details[data-astro-cid-hmbqz6xi][open] summary[data-astro-cid-hmbqz6xi]:after{transform:translateY(-20%)rotate(225deg)}.faq[data-astro-cid-hmbqz6xi] summary[data-astro-cid-hmbqz6xi]:focus-visible{outline:3px solid var(--accent-tint);outline-offset:3px}.faq[data-astro-cid-hmbqz6xi] p[data-astro-cid-hmbqz6xi]{margin:0;padding:0 0 16px}@media (width>=640px){.faq[data-astro-cid-hmbqz6xi]{padding:28px}}
